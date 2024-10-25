@@ -28,9 +28,29 @@ class Program
         string filterDistrict = config["FilterDistrict"] ?? "undefined";
         DateTime deliveryTimeStart = DateTime.Parse(config["DeliveryTimes:Start"] ?? DateTime.Now.ToString());
         DateTime? deliveryTimeEnd = null;
-        if (config["DeliveryTimes:End"] != null)
+
+        string endDateString = config["DeliveryTimes:End"];
+        if (!string.IsNullOrWhiteSpace(endDateString))
         {
-            deliveryTimeEnd = DateTime.Parse(config["DeliveryTimes:End"]);
+            if (DateTime.TryParse(endDateString, out var parsedEndDate))
+            {
+                if (parsedEndDate < deliveryTimeStart)
+                {
+                    Console.WriteLine("Incorrect end date: cannot be earlier than start date. Filtering only by start date.");
+                }
+                else
+                {
+                    deliveryTimeEnd = parsedEndDate;
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Invalid end date format: '{endDateString}'. Filtering only by start date.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("No end date provided. Filtering only by start date.");
         }
 
 
