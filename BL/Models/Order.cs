@@ -21,9 +21,9 @@ namespace BL.Models
             return $"Id: {OrderId}, Weight: {Math.Round(Weight, 2)}, Area: {Area}, Delivary time: {DeliveryTime:yyyy-MM-dd HH:mm:ss}";
         }
 
-        public static Order Parse(string inputData)
+        public static Order Parse(string inputData, string delimeter = ",")
         {
-            var parts = inputData.Split(',');
+            var parts = inputData.Split(delimeter);
 
             if (parts.Length != 4)
             {

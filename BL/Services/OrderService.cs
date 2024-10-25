@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BL.Services
 {
-    public class OrderService
+    public class OrderService : IOrderService
     {
         private readonly ILogger _logger;
 
@@ -16,9 +16,9 @@ namespace BL.Services
         {
             _logger = logger;
         }
-        public List<Order> FilterOrders(List<Order> orders, string filterArea, DateTime deliveryTimeStart, DateTime? deliveryTimeEnd)
+        public List<Order> FilterOrders(List<Order> orders, string filterDistrict, DateTime deliveryTimeStart, DateTime? deliveryTimeEnd)
         {
-            _logger.LogInformation($"Filtering orders according to: {filterArea}, {deliveryTimeStart}, {(deliveryTimeEnd.HasValue ? deliveryTimeEnd.Value.ToString() : "No end time")}");
+            _logger.LogInformation($"Filtering orders according to: {filterDistrict}, {deliveryTimeStart}, {(deliveryTimeEnd.HasValue ? deliveryTimeEnd.Value.ToString() : "No end time")}");
 
             if (orders.Count == 0)
             {
@@ -26,7 +26,7 @@ namespace BL.Services
             }
 
             var filteredOrders = orders.FindAll(o =>
-                o.Area.Equals(filterArea, StringComparison.OrdinalIgnoreCase) &&
+                o.Area.Equals(filterDistrict, StringComparison.OrdinalIgnoreCase) &&
                 o.DeliveryTime >= deliveryTimeStart);
 
             if (deliveryTimeEnd.HasValue)
@@ -94,12 +94,13 @@ namespace BL.Services
         {
             _logger.LogInformation($"Writing {filteredOrders.Count} filtered orders to file: '{filePath}'");
 
+            if (!Path.GetExtension(filePath).Equals(".csv", StringComparison.CurrentCultureIgnoreCase))
+            {
+                throw new InvalidOperationException("The output file format is not CSV. Please save the file with a .csv extension.");
+            }
+
             try
             {
-                if (!Path.GetExtension(filePath).Equals(".csv", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    throw new InvalidOperationException("The output file format is not CSV. Please save the file with a .csv extension.");
-                }
 
                 using (var writer = new StreamWriter(filePath))
                 {

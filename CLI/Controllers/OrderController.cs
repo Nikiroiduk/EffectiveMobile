@@ -11,18 +11,17 @@ namespace CLI.Controllers
 {
     public class OrderController
     {
-        private OrderService _orderService;
+        private readonly IOrderService _orderService;
         private List<Order> _orders = new List<Order>();
-
-        public OrderController(ILogger logger)
+        public List<Order> Orders
         {
-            _orderService = new OrderService(logger);
+            get => _orders;
+            set => _orders = value;
         }
 
-        public OrderController(List<Order> orders, ILogger logger)
+        public OrderController(IOrderService orderService)
         {
-            _orderService = new OrderService(logger);
-            _orders = orders;
+            _orderService = orderService;
         }
 
         public void ReadOrders(string filePath)
@@ -55,11 +54,11 @@ namespace CLI.Controllers
             Console.WriteLine($"Data loaded [{_orders.Count}]");
         }
 
-        public void ProcessOrders(string area, DateTime deliveryTimeStart, DateTime? deliveryTimeEnd)
+        public void ProcessOrders(string district, DateTime deliveryTimeStart, DateTime? deliveryTimeEnd)
         {
             try
             {
-                _orders = _orderService.FilterOrders(_orders, area, deliveryTimeStart, deliveryTimeEnd);
+                _orders = _orderService.FilterOrders(_orders, district, deliveryTimeStart, deliveryTimeEnd);
                 Console.WriteLine($"Data filtered [{_orders.Count}]");
             }
             catch(InvalidDataException ex)
