@@ -61,14 +61,12 @@ class Program
         Console.WriteLine($"Delivery Time Start: {deliveryTimeStart}");
         Console.WriteLine($"Delivery Time End: {deliveryTimeEnd}\n");
         
-        //DI
         var serviceProvider = new ServiceCollection()
             .AddSingleton<IOrderService, OrderService>()
             .AddSingleton<OrderController>()
             .AddSingleton<BL.Logging.ILogger>(sp => new SerilogLogger(logPath))
             .BuildServiceProvider();
 
-        // Create an instance of OrderController using the DI container
         var controller = serviceProvider.GetRequiredService<OrderController>();
 
         controller.ReadOrders(filePath);
